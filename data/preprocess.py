@@ -15,9 +15,8 @@ def handle_alternate(chord):
     """Handle A/Cs -> A"""
     if '/' in chord:
         parts = chord.split('/')
-        # Simple heuristic: if second part looks like chord, take first
-        if len(parts[1]) > 2:
-            return parts[0]
+        
+        return parts[0]
     return chord
 
 def preprocess_dataset():
@@ -38,9 +37,11 @@ def preprocess_dataset():
     print("Building vocabularies...")
     for item in ds['train']:
         # Add genre
-        genre = f"<GENRE_{item['main_genre'].upper()}>"
-        if genre not in genre_vocab:
-            genre_vocab[genre] = len(genre_vocab)
+        
+        if item['main_genre'] is not None:
+            genre = f"<GENRE_{item['main_genre'].upper()}>"
+            if genre not in genre_vocab:
+                genre_vocab[genre] = len(genre_vocab)
         
         # Process chords
         tokens = item['chords'].split()
@@ -69,9 +70,12 @@ def preprocess_dataset():
     processed_data = []
     
     print("Processing sequences...")
+    
     for item in ds['train']:
-        genre_token = f"<GENRE_{item['main_genre'].upper()}>"
-        tokens = item['chords'].split()
+        
+        if item['main_genre'] is not None:
+            genre_token = f"<GENRE_{item['main_genre'].upper()}>"
+            tokens = item['chords'].split()
         
         # Preprocess tokens
         processed_tokens = []
@@ -106,16 +110,13 @@ def preprocess_dataset():
     print(f"Processed {len(processed_data)} sequences")
     
     # Save
-    with open('data/vocab.json', 'w') as f:
+    with open('vocab.json', 'w') as f:
         json.dump(full_vocab, f, indent=2)
     
-    with open('data/processed_data.json', 'w') as f:
+    with open('processed_data.json', 'w') as f:
         json.dump(processed_data, f, indent=2)
     
     print("Preprocessing complete!")
-    print("Files saved:")
-    print("  - data/vocab.json")
-    print("  - data/processed_data.json")
     
     return full_vocab, processed_data
 
