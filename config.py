@@ -10,6 +10,10 @@ class Config:
     feedforward_dim = 1024
     dropout = 0.1
     
+     # Training - Base
+    base_epochs = 50
+    base_batch_size = 8
+    base_lr = 1e-3
     
     # Paths
     data_dir = "data"
